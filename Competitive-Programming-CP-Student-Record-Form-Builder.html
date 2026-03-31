@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CP Student Record Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            * {
+                box-sizing: border-box !important;
+            }
+            body {
+                background-color: white;
+                font-size: 11pt;
+                color: #000;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                overflow-x: hidden !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                border-top: none !important;
+                overflow-x: hidden !important;
+            }
+            
+            /* Typography optimizations for print */
+            h1 { font-size: 16pt !important; margin-bottom: 2px !important; color: #003366 !important; }
+            h2 { font-size: 12pt !important; margin-top: 0 !important; }
+            h3 { font-size: 11pt !important; margin-bottom: 6px !important; padding-bottom: 2px !important; border-bottom: 1px solid #003366 !important; }
+            p, label { font-size: 9.5pt !important; margin-bottom: 2px !important; color: #111 !important; }
+            section { margin-bottom: 12px !important; }
+            
+            /* Form inputs specifically styled for written/printed forms */
+            input, textarea {
+                border: none !important;
+                border-bottom: 1px solid #777 !important;
+                border-radius: 0 !important;
+                resize: none !important;
+                box-shadow: none !important;
+                padding: 2px 0 !important;
+                height: 20px !important;
+                font-size: 10pt !important;
+                background-color: transparent !important;
+                width: 100% !important;
+            }
+            textarea { height: 35px !important; }
+
+            /* Hide placeholders (answer suggestions) on print */
+            ::-webkit-input-placeholder { color: transparent !important; }
+            ::-moz-placeholder { color: transparent !important; }
+            :-ms-input-placeholder { color: transparent !important; }
+            ::placeholder { color: transparent !important; }
+
+            /* Grid Layout Forcer - Ensures side-by-side and prevents horizontal overflow */
+            .print-half {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 12px 16px !important;
+                width: 100% !important;
+            }
+            .print-full {
+                grid-column: 1 / -1 !important;
+            }
+
+            /* Contest History specifically kept inline via grid */
+            .contest-row {
+                display: grid !important;
+                grid-template-columns: 4fr 1.5fr 4.5fr !important;
+                gap: 12px !important;
+                width: 100% !important;
+                margin-top: 6px !important;
+            }
+            
+            /* Hide mobile labels on print */
+            .md\:hidden { display: none !important; }
+            
+            /* Spacing adjustments */
+            .space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 16px !important; }
+            .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 6px !important; }
+            .mb-8 { margin-bottom: 16px !important; }
+            
+            /* Notice block formatting */
+            .notice-block { 
+                background-color: transparent !important; 
+                border-left: 3px solid #003366 !important; 
+                padding: 4px 8px !important; 
+                margin-bottom: 16px !important; 
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 antialiased py-8 px-4">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Action Bar -->
+        <div class="mb-4 flex justify-end gap-3 no-print">
+            <button onclick="clearDraft()" class="bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2 px-4 rounded shadow transition duration-150 ease-in-out flex items-center border border-red-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                Clear Data
+            </button>
+            <button onclick="window.print()" class="bg-[#003366] hover:bg-[#002244] text-white font-semibold py-2 px-4 rounded shadow transition duration-150 ease-in-out flex items-center border border-[#003366]">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Print / Save as PDF
+            </button>
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-white p-8 md:p-12 shadow-lg rounded-lg print-container border-t-8 border-[#003366]">
+            
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-2xl md:text-3xl font-bold uppercase tracking-wide text-[#003366]">Official Notice</h1>
+                <h2 class="text-xl md:text-2xl font-semibold text-gray-700 mt-2">Competitive Programming (CP) Student Record</h2>
+            </div>
+
+            <!-- Notice Block -->
+            <div class="bg-[#f0f4f8] notice-block border-l-4 border-[#003366] p-4 mb-8 rounded-r">
+                <p class="mb-2 text-sm md:text-base">This is an official request for all students with a Competitive Programming (CP) background. The Department is collecting your CP records and achievements.</p>
+                <p class="font-semibold text-sm md:text-base text-[#002244] mb-2">Note: This is mandatory for every student from any Year, Intake, or Section. If you don't have information for a specific field (like Onsite Rank), just leave it blank.</p>
+                <p class="text-sm md:text-base italic text-[#003366] font-medium">Please ensure all information provided is strictly accurate. The official submission link is available at the bottom of this form.</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mb-8 no-print">
+                <div class="flex justify-between mb-1">
+                    <span class="text-sm font-medium text-[#003366]">Form Completion</span>
+                    <span id="progress-text" class="text-sm font-bold text-[#003366]">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="progress-bar" class="bg-green-500 h-2 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <form onsubmit="event.preventDefault();" class="space-y-8">
+
+                <!-- Academic Details -->
+                <section>
+                    <h3 class="text-lg font-bold border-b-2 border-gray-200 pb-2 mb-4 text-[#003366] uppercase tracking-wider">Academic Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 print-half">
+                        <div class="print-full md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+                            <input type="text" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="John Doe">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Student ID <span class="text-red-500">*</span></label>
+                            <input type="text" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="e.g., 20230001">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Department <span class="text-red-500">*</span></label>
+                            <input type="text" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Computer Science">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Intake <span class="text-red-500">*</span></label>
+                            <input type="text" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="e.g., Fall 2023">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Section <span class="text-red-500">*</span></label>
+                            <input type="text" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="e.g., Section A">
+                        </div>
+                        <div class="print-full md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Address <span class="text-red-500">*</span></label>
+                            <input type="email" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="student@university.edu">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Online Judge Profiles -->
+                <section>
+                    <h3 class="text-lg font-bold border-b-2 border-gray-200 pb-2 mb-4 text-[#003366] uppercase tracking-wider">Online Judge Profiles</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 print-half">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Codeforces Handle</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Handle">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Max Rating</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="e.g., 1450">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 print-half">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">CodeChef Handle</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Handle">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Max Rating</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="e.g., 1600 (3 Star)">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 print-half">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">AtCoder Handle</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Handle">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Max Rating</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="e.g., 800">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 print-half">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Vjudge Username</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Username">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Solve Count</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="e.g., 250">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 print-half">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">LeetCode Profile</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Profile Link">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="e.g., 1800">
+                            </div>
+                        </div>
+
+                        <div class="print-full">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Other Platforms</label>
+                            <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="e.g., UVA (Username | Solve Count), LightOJ (Handle)">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Language Expertise -->
+                <section>
+                    <h3 class="text-lg font-bold border-b-2 border-gray-200 pb-2 mb-4 text-[#003366] uppercase tracking-wider">Language Expertise</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 print-half">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Primary Language <span class="text-red-500">*</span></label>
+                            <input type="text" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="e.g., C++">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Other Languages</label>
+                            <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="e.g., Java, Python">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Onsite Contest History -->
+                <section>
+                    <h3 class="text-lg font-bold border-b-2 border-gray-200 pb-2 mb-4 text-[#003366] uppercase tracking-wider">Onsite Contest History</h3>
+                    <div id="contest-container" class="space-y-4">
+                        <!-- Contest Row 1 -->
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center contest-row">
+                            <div class="md:col-span-5">
+                                <label class="block text-sm font-medium text-gray-700 mb-1 md:hidden">Contest Name</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Contest Name">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1 md:hidden">Rank</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Rank">
+                            </div>
+                            <div class="md:col-span-5">
+                                <label class="block text-sm font-medium text-gray-700 mb-1 md:hidden">Team Name</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Team Name">
+                            </div>
+                        </div>
+                        <!-- Contest Row 2 -->
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center contest-row">
+                            <div class="md:col-span-5">
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Contest Name">
+                            </div>
+                            <div class="md:col-span-2">
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Rank">
+                            </div>
+                            <div class="md:col-span-5">
+                                <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Team Name">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addContestRow()" class="mt-4 text-[#003366] hover:text-[#002244] text-sm font-semibold flex items-center no-print transition">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        Add another contest
+                    </button>
+                </section>
+
+                <!-- Achievements & Awards -->
+                <section>
+                    <h3 class="text-lg font-bold border-b-2 border-gray-200 pb-2 mb-4 text-[#003366] uppercase tracking-wider">Achievements & Awards</h3>
+                    <p class="text-sm text-gray-500 mb-2 no-print">Major achievements, certificates, or recognitions</p>
+                    <textarea rows="3" class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="1. &#10;2. &#10;3. "></textarea>
+                </section>
+
+                <!-- Contributions & Experience -->
+                <section class="print-half">
+                    <h3 class="text-lg font-bold border-b-2 border-gray-200 pb-2 mb-4 text-[#003366] uppercase tracking-wider print-full">Contributions & Experience</h3>
+                    <div class="w-full">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Volunteer Experience</label>
+                        <textarea rows="2" class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Briefly describe any volunteering experience related to CP or departmental events..."></textarea>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Extra Experience</label>
+                        <textarea rows="2" class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Any other relevant experience (e.g., problem setting, mentoring)..."></textarea>
+                    </div>
+                </section>
+
+            </form>
+            
+            <!-- Footer Instruction (Hidden in Print) -->
+            <div class="mt-8 pt-6 border-t border-gray-200 text-center bg-[#f0f4f8] p-6 rounded no-print">
+                <p class="text-gray-900 text-lg font-semibold mb-2"><strong>Instruction:</strong> Please review your details carefully and ensure all provided information is accurate.</p>
+                <p class="text-gray-700 mb-4">Once you are ready, submit your official record using the link below:</p>
+                
+                <div class="mb-4">
+                    <a href="https://forms.gle/b7K4cM1ANu6k84Bd7" target="_blank" class="inline-flex items-center bg-[#FFCC00] hover:bg-[#E6B800] text-[#003366] font-bold py-3 px-6 rounded shadow-md transition duration-150 ease-in-out transform hover:-translate-y-0.5">
+                        Open Submission Form
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                </div>
+
+                <p class="text-gray-800 font-medium">
+                    <span class="text-sm text-gray-500 mr-1">Direct Link:</span>
+                    <a href="https://forms.gle/b7K4cM1ANu6k84Bd7" target="_blank" class="text-[#003366] underline break-all hover:text-[#002244]">https://forms.gle/b7K4cM1ANu6k84Bd7</a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 bg-[#003366] text-white px-6 py-3 rounded shadow-xl flex items-center no-print z-50 pointer-events-none">
+        <svg class="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span id="toast-msg" class="font-medium">Draft saved</span>
+    </div>
+
+    <script>
+        function addContestRow() {
+            const container = document.getElementById('contest-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'grid grid-cols-1 md:grid-cols-12 gap-4 items-center contest-row mt-4 opacity-0 transition-opacity duration-300';
+            newRow.innerHTML = `
+                <div class="md:col-span-5">
+                    <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Contest Name">
+                </div>
+                <div class="md:col-span-2">
+                    <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Rank">
+                </div>
+                <div class="md:col-span-5">
+                    <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003366] outline-none transition" placeholder="Team Name">
+                </div>
+            `;
+            container.appendChild(newRow);
+            
+            // Trigger fade in
+            requestAnimationFrame(() => {
+                newRow.classList.remove('opacity-0');
+            });
+            
+            // Recalculate progress based on new inputs
+            if (window.updateProgress) window.updateProgress();
+        }
+
+        // --- Interactive JS Features ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const formContainer = document.querySelector('form');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            let saveTimeout;
+
+            // 1. Update Progress & Auto-Save
+            window.updateProgress = function() {
+                const inputs = document.querySelectorAll('input, textarea');
+                let filled = 0;
+                const formData = {};
+                
+                inputs.forEach((input, index) => {
+                    if(input.value.trim() !== '') filled++;
+                    // Generate a stable key for saving based on position and placeholder
+                    const key = (input.getAttribute('placeholder') || 'input') + '-' + index;
+                    formData[key] = input.value;
+                });
+                
+                const percentage = Math.round((filled / inputs.length) * 100) || 0;
+                progressBar.style.width = percentage + '%';
+                progressText.innerText = percentage + '%';
+
+                // Save to local storage so data isn't lost on refresh
+                localStorage.setItem('cp_form_draft', JSON.stringify(formData));
+
+                // Debounced Toast Notification (waits until you stop typing for 1 second)
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => showToast('Draft auto-saved'), 1000);
+            };
+
+            // 2. Load Draft on Startup
+            function loadDraft() {
+                const saved = localStorage.getItem('cp_form_draft');
+                if (saved) {
+                    try {
+                        const formData = JSON.parse(saved);
+                        const inputs = document.querySelectorAll('input, textarea');
+                        inputs.forEach((input, index) => {
+                            const key = (input.getAttribute('placeholder') || 'input') + '-' + index;
+                            if (formData[key]) {
+                                input.value = formData[key];
+                            }
+                        });
+                    } catch (e) { console.error('Error loading draft', e); }
+                }
+                updateProgress(); // Run once to set initial progress bar state
+            }
+
+            // 3. Clear Form Logic
+            window.clearDraft = function() {
+                if(confirm('Are you sure you want to clear all entered data?')) {
+                    const inputs = document.querySelectorAll('input, textarea');
+                    inputs.forEach(input => input.value = '');
+                    localStorage.removeItem('cp_form_draft');
+                    updateProgress();
+                    showToast('All data cleared');
+                }
+            };
+
+            // 4. Toast UI Function
+            function showToast(msg) {
+                toastMsg.innerText = msg;
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                }, 3000);
+            }
+
+            // Listen to all typing anywhere inside the form
+            formContainer.addEventListener('input', updateProgress);
+            
+            // Initialize data on page load
+            loadDraft();
+
+            // --- Print Layout Optimization ---
+            // Converts inputs to wrapping text blocks during print to prevent horizontal scroll
+            // and naturally extend the section vertically for long user data.
+            window.addEventListener('beforeprint', () => {
+                document.querySelectorAll('input, textarea').forEach(field => {
+                    const div = document.createElement('div');
+                    div.className = 'print-data-element';
+                    div.style.borderBottom = '1px solid #777';
+                    div.style.padding = '2px 0';
+                    div.style.fontSize = '10pt';
+                    div.style.minHeight = field.tagName.toLowerCase() === 'textarea' ? '35px' : '20px';
+                    div.style.wordBreak = 'break-word';
+                    div.style.overflowWrap = 'anywhere';
+                    div.style.whiteSpace = 'pre-wrap';
+                    div.style.width = '100%';
+                    div.innerText = field.value || ' ';
+                    
+                    field.style.display = 'none';
+                    field.parentNode.insertBefore(div, field.nextSibling);
+                });
+            });
+
+            window.addEventListener('afterprint', () => {
+                document.querySelectorAll('.print-data-element').forEach(el => el.remove());
+                document.querySelectorAll('input, textarea').forEach(field => {
+                    field.style.display = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
